@@ -28,7 +28,11 @@
       }
     ]
   },
-  "logo": "/logo/dark.png",
+  "logo": {
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png",
+    "href": "https://novisurf.top/console"
+  },
   "navbar": {
     "links": [
       {
