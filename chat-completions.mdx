@@ -1,0 +1,192 @@
+---
+title: "Chat Completions"
+tag: "POST"
+---
+
+> Novisurf is fully OpenAI-compatible. If you're already using the OpenAI SDK, just swap the base URL and API key — nothing else changes.
+
+---
+
+## Endpoint
+
+```text
+POST https://api2.novisurf.top/v1/chat/completions
+```
+
+---
+
+## Authentication
+
+Novisurf supports two ways to authenticate:
+
+**X-API-Key header**
+
+```text
+X-API-Key: lsk_...
+```
+
+**Bearer token (Recommended)**
+
+```text
+Authorization: Bearer lsk_...
+```
+
+Your API key is available in the [Novisurf Dashboard](https://novisurf.top/console).
+
+---
+
+## Request
+
+### Headers
+
+| Header | Value |
+| --- | --- |
+| `Content-Type` | `application/json` |
+| `Authorization Bearer` | Your API key (`lsk_...`) |
+
+### Body Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `model` | string | Yes | The model to use. Check models in your console. |
+| `messages` | array | Yes | Conversation history as an array of message objects. |
+| `stream` | boolean | Optional | Stream the response via SSE. Defaults to `false`. |
+| `temperature` | number | Optional | Sampling temperature between `0` and `2`. Defaults to `1.0`. |
+| `max_tokens` | integer | Optional | Maximum tokens to generate. |
+| `top_p` | number | Optional | Nucleus sampling threshold between `0` and `1`. Defaults to `1.0`. |
+| `stop` | string or array | Optional | Up to 4 stop sequences. |
+
+### Message Object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `role` | string | One of `system`, `user`, or `assistant`. |
+| `content` | string | The message content. |
+
+---
+
+## Examples
+
+### Basic
+
+```bash
+curl https://api2.novisurf.top/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: lsk_..." \
+  -d '{
+    "model": "llama-3.3-70b-versatile",
+    "messages": [
+      { "role": "system", "content": "You are a helpful assistant." },
+      { "role": "user", "content": "What is the capital of France?" }
+    ]
+  }'
+```
+
+### Streaming
+
+```bash
+curl https://api2.novisurf.top/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: lsk_..." \
+  -d '{
+    "model": "llama-3.3-70b-versatile",
+    "messages": [
+      { "role": "user", "content": "Write me a short poem." }
+    ],
+    "stream": true
+  }'
+```
+
+### OpenAI SDK (drop-in)
+
+```js
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "lsk_...",
+  baseURL: "https://api2.novisurf.top/v1",
+});
+
+const response = await client.chat.completions.create({
+  model: "llama-3.3-70b-versatile",
+  messages: [
+    { role: "user", content: "What is the capital of France?" }
+  ],
+});
+
+console.log(response.choices[0].message.content);
+```
+
+### Python (OpenAI SDK)
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="lsk_...",
+    base_url="https://api2.novisurf.top/v1"
+)
+
+response = client.chat.completions.create(
+    model="llama-3.3-70b-versatile",
+    messages=[
+        { "role": "user", "content": "What is the capital of France?" }
+    ]
+)
+
+print(response.choices[0].message.content)
+```
+
+---
+
+## Response
+
+### Non-Streaming
+
+```json
+{
+  "id": "chatcmpl-a1b2c3d4e5f6",
+  "object": "chat.completion",
+  "created": 1745000000,
+  "model": "llama-3.3-70b-versatile",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "The capital of France is Paris."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 24,
+    "completion_tokens": 9,
+    "total_tokens": 33
+  }
+}
+```
+
+### Streaming
+
+Streamed responses are sent as SSE events and terminated with `data: [DONE]`.
+
+```text
+data: {"id":"chatcmpl-a1b2c3d4e5f6","object":"chat.completion.chunk","created":1745000000,"model":"llama-3.3-70b-versatile","choices":[{"index":0,"delta":{"role":"assistant","content":"The"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-a1b2c3d4e5f6","object":"chat.completion.chunk","created":1745000000,"model":"llama-3.3-70b-versatile","choices":[{"index":0,"delta":{"content":" capital of France is Paris."},"finish_reason":"stop"}]}
+
+data: [DONE]
+```
+
+---
+
+## Error Codes
+
+| Status | Meaning |
+| --- | --- |
+| `400` | Bad request — missing or invalid parameters |
+| `401` | Unauthorized — invalid or missing API key |
+| `402` | Insufficient credits |
+| `429` | Rate limit exceeded |
+| `500` | Internal server error |

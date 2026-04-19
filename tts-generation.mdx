@@ -1,0 +1,147 @@
+---
+title: "TTS Generation"
+tag: "POST"
+---
+
+Learn how to instantly generate lifelike audio from text using Novisurf's fast TTS API.
+
+## Overview
+
+The Novisurf speech endpoint lets you convert text to spoken audio in seconds. It is fully OpenAI-compatible — just swap the base URL and API key and your existing code works out of the box.
+
+## Endpoint
+
+| Endpoint | Usage | URL |
+|---|---|---|
+| Speech | Convert text to audio | `POST https://api2.novisurf.top/v1/audio/speech` |
+
+## Authentication
+
+**Bearer token (recommended)**
+```
+X-API-Key: lsk_...
+```
+
+**X-API-Key header**
+```
+Authorization: Bearer lsk_...
+```
+
+Your API key is available in the [Novisurf Dashboard](https://novisurf.top/dashboard).
+
+## Supported Models
+
+| Model ID | Description |
+|---|---|
+| `shellai/melotts` | Fast, lightweight multilingual TTS |
+
+## Quick Start
+
+The speech endpoint takes four key inputs:
+
+- **model:** the TTS model to use
+- **input:** the text to generate audio from
+- **voice:** the desired voice for output
+- **response_format:** defaults to `mp3`
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `model` | string | Yes | TTS model ID. |
+| `input` | string | Yes | Text to synthesize. |
+| `voice` | string | Yes | Voice to use for output. |
+| `response_format` | string | No | Output audio format. Defaults to `mp3`. |
+| `speed` | number | No | Playback speed from `0.25` to `4.0`. Defaults to `1.0`. |
+
+---
+
+### Python
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="lsk_...",
+    base_url="https://api2.novisurf.top/v1"
+)
+
+speech_file_path = "speech.mp3"
+
+response = client.audio.speech.create(
+    model="shellai/melotts",
+    voice="en-us",
+    input="Hello! Welcome to Novisurf. Fast inference, built for developers.",
+    response_format="mp3"
+)
+
+response.stream_to_file(speech_file_path)
+```
+
+### JavaScript
+
+```js
+import fs from "fs";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "lsk_...",
+  baseURL: "https://api2.novisurf.top/v1",
+});
+
+const speechFilePath = "speech.mp3";
+
+async function main() {
+  const response = await client.audio.speech.create({
+    model: "shellai/melotts",
+    voice: "en-us",
+    input: "Hello! Welcome to Novisurf. Fast inference, built for developers.",
+    response_format: "mp3",
+  });
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  await fs.promises.writeFile(speechFilePath, buffer);
+
+  console.log(`Speech generated: ${speechFilePath}`);
+}
+
+main().catch(console.error);
+```
+
+### cURL
+
+```bash
+curl https://api2.novisurf.top/v1/audio/speech \
+  -X POST \
+  -H "X-API-Key: lsk_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "shellai/melotts",
+    "input": "Hello! Welcome to Novisurf. Fast inference, built for developers.",
+    "voice": "en-us",
+    "response_format": "mp3"
+  }' \
+  --output speech.mp3
+```
+
+---
+
+## Response
+
+The response is raw audio binary in the requested format, not JSON. Save the response body directly to a file.
+
+| Header | Value |
+|---|---|
+| `Content-Type` | `audio/mpeg` for mp3, `audio/wav` for wav |
+
+---
+
+## Error Codes
+
+| Status | Meaning |
+|---|---|
+| `400` | Bad request — missing or invalid parameters |
+| `401` | Unauthorized — invalid or missing API key |
+| `402` | Insufficient credits |
+| `429` | Rate limit exceeded |
+| `500` | Internal server error |
