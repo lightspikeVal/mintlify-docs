@@ -1,15 +1,19 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Novisurf Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#d3db2d",
+    "light": "#c1c906",
+    "dark": "#ecee4f"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "groups": [
+      {
+        "group": "Introduction",
+        "pages": []
+      },
       {
         "group": "Text API",
         "pages": [
