@@ -63,5 +63,12 @@
       "github": "https://github.com/mintlify",
       "linkedin": "https://linkedin.com/company/mintlify"
     }
+  },
+  "fonts": {
+    "family": "Geist",
+    "weight": 200,
+    "body": {
+      "family": "Montserrat"
+    }
   }
 }
