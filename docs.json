@@ -28,10 +28,7 @@
       }
     ]
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
+  "logo": "/logo/dark.png",
   "navbar": {
     "links": [
       {
